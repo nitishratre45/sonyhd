@@ -3,7 +3,7 @@
 // =========================================================
 
 const STREAM_URL =
-  "https://cloudplay-sonyliv.pages.dev/ten3.m3u8";
+  "http://tvsen5.aynascope.net/willowhd/index.m3u8";
 
 const video = document.getElementById("videoPlayer");
 const streamStatus = document.getElementById("streamStatus");
