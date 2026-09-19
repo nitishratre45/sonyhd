@@ -3,7 +3,7 @@
 // =========================================================
 
 const STREAM_URL =
-  "https://cloudplay-sonyliv.pages.dev/ten3.m3u8";
+  "https://7nyaler.streamhostingcdn.top/stream/36/index.m3u8";
 
 const video = document.getElementById("videoPlayer");
 const streamStatus = document.getElementById("streamStatus");
