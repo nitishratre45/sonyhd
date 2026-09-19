@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SONY HD - Live</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <header>
+    <h1>FAMILY FULL HOUSE WITH ROHIT SHARMA</h1>
+    <span class="live">● LIVE</span>
+  </header>
+
+  <main>
+
+    <section class="player-box">
+      <video
+        id="videoPlayer"
+        controls
+        autoplay
+        playsinline>
+      </video>
+
+      <div id="status"><span class="watching"> 👁 <b id="watchingCount">150</b> Watching</span>
+        Connecting to live stream...
+      </div>
+    </section>
+
+    <section class="info">
+      <h2>SONY HD</h2>
+      <p>Live Channel</p>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script type="module" src="app.js"></script>
+
+</body>
+</html>
+
+

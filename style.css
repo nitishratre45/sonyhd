@@ -1,0 +1,610 @@
+﻿:root {
+  --bg1: #07142f;
+  --bg2: #1b0d35;
+  --card: rgba(18, 27, 58, 0.88);
+  --white: #ffffff;
+  --muted: #b8c1dc;
+  --red: #ff3650;
+  --blue: #4d7cff;
+  --purple: #a855f7;
+}
+
+/* ================= RESET ================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--white);
+
+  background:
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(40, 100, 230, 0.55),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 100% 5%,
+      rgba(190, 65, 220, 0.48),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      var(--bg1),
+      #0b1230 50%,
+      var(--bg2)
+    );
+
+  background-attachment: fixed;
+}
+
+/* ================= SELECTION ================= */
+
+::selection {
+  background: rgba(77, 124, 255, 0.45);
+  color: #ffffff;
+}
+
+/* ================= SCROLLBAR ================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080b18;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    #4d7cff,
+    #a855f7
+  );
+
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    #628bff,
+    #bd6cff
+  );
+}
+
+/* ================= HEADER ================= */
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  width: 100%;
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 25px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 10, 28, 0.97),
+      rgba(18, 16, 45, 0.94)
+    );
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.28);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+header::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: -1px;
+
+  height: 2px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #4d7cff,
+      #a855f7,
+      transparent
+    );
+}
+
+header h1 {
+  max-width: 88%;
+
+  font-size: 20px;
+  line-height: 1.25;
+
+  font-weight: 800;
+  letter-spacing: 0.7px;
+
+  color: #ffffff;
+
+  text-transform: uppercase;
+}
+
+/* ================= LIVE ================= */
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  color: var(--red);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  white-space: nowrap;
+
+  text-shadow:
+    0 0 12px rgba(255, 54, 80, 0.45);
+
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ================= MAIN ================= */
+
+main {
+  width: 100%;
+  max-width: 1050px;
+
+  margin: 0 auto;
+
+  padding: 28px 18px 55px;
+}
+
+/* ================= PLAYER ================= */
+
+.player-box {
+  position: relative;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  background: #03050b;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.45),
+    0 0 45px rgba(65, 95, 220, 0.15);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.player-box::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 3px;
+
+  z-index: 5;
+
+  background:
+    linear-gradient(
+      90deg,
+      #3f6cff,
+      #8652ff,
+      #d34eea
+    );
+}
+
+/* ================= VIDEO ================= */
+
+video {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  aspect-ratio: 16 / 9;
+
+  background:
+    radial-gradient(
+      circle,
+      #1a2140,
+      #05070d 72%
+    );
+
+  object-fit: contain;
+}
+
+/* ================= STATUS ================= */
+
+#status {
+  min-height: 43px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 10px 15px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #101a3b,
+      #21133d
+    );
+
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+  color: var(--muted);
+
+  font-size: 13px;
+}
+
+/* ================= SONY HD CARD ================= */
+
+.info {
+  position: relative;
+
+  margin-top: 18px;
+
+  padding: 21px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(43, 72, 150, 0.95),
+      rgba(92, 39, 125, 0.95)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  border-radius: 15px;
+
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.30);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.info::before {
+  content: "";
+
+  position: absolute;
+
+  width: 220px;
+  height: 220px;
+
+  right: -100px;
+  top: -130px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.15),
+      transparent 68%
+    );
+
+  pointer-events: none;
+}
+
+.info::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 3px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #4d7cff,
+      #9253ff,
+      #d64de9
+    );
+}
+
+.info h2 {
+  position: relative;
+  z-index: 2;
+
+  margin-bottom: 6px;
+
+  font-size: 23px;
+  font-weight: 800;
+
+  letter-spacing: 0.3px;
+
+  color: #ffffff;
+}
+
+.info p {
+  position: relative;
+  z-index: 2;
+
+  color: #d2d8eb;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+/* ================= HOVER ================= */
+
+.player-box:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(90, 120, 255, 0.35);
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.50),
+    0 0 55px rgba(65, 95, 220, 0.20);
+}
+
+.info:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.38);
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 600px) {
+
+  body {
+    background:
+      radial-gradient(
+        circle at 0% 0%,
+        rgba(43, 91, 190, 0.50),
+        transparent 38%
+      ),
+      radial-gradient(
+        circle at 100% 8%,
+        rgba(175, 55, 210, 0.40),
+        transparent 38%
+      ),
+      linear-gradient(
+        145deg,
+        #07132d,
+        #0d1230 55%,
+        #1c0b2b
+      );
+
+    background-attachment: fixed;
+  }
+
+  header {
+    min-height: 58px;
+
+    padding:
+      10px 12px;
+  }
+
+  header h1 {
+    max-width: calc(100% - 55px);
+
+    font-size: 12px;
+
+    letter-spacing: 0.3px;
+
+    line-height: 1.3;
+  }
+
+  .live {
+    font-size: 10px;
+  }
+
+  main {
+    padding:
+      12px 7px 35px;
+  }
+
+  .player-box {
+    border-radius: 10px;
+
+    box-shadow:
+      0 16px 42px rgba(0, 0, 0, 0.42);
+  }
+
+  video {
+    aspect-ratio: 16 / 9;
+  }
+
+  #status {
+    min-height: 37px;
+
+    padding: 8px 11px;
+
+    font-size: 12px;
+  }
+
+  .info {
+    margin-top: 12px;
+
+    padding: 16px;
+
+    border-radius: 11px;
+  }
+
+  .info h2 {
+    font-size: 19px;
+  }
+
+  .info p {
+    font-size: 13px;
+  }
+}
+
+/* ================= SMALL PHONE ================= */
+
+@media (max-width: 380px) {
+
+  header {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  header h1 {
+    font-size: 10.5px;
+  }
+
+  .live {
+    font-size: 9px;
+  }
+
+  main {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .info {
+    padding: 14px;
+  }
+
+  .info h2 {
+    font-size: 18px;
+  }
+}
+
+/* ================= LANDSCAPE PHONE ================= */
+
+@media (max-height: 500px) and (orientation: landscape) {
+
+  header {
+    min-height: 52px;
+  }
+
+  main {
+    padding-top: 10px;
+  }
+
+  .info {
+    margin-top: 10px;
+  }
+}
+
+/* ================= SAFE AREA ================= */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+
+  main {
+    padding-bottom:
+      calc(
+        35px + env(safe-area-inset-bottom)
+      );
+  }
+}
+
+/* ================= REDUCED MOTION ================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  .live {
+    animation: none;
+  }
+
+  .player-box,
+  .info {
+    transition: none;
+  }
+}
+
+/* ================= LIVE WATCHING ================= */
+
+#status {
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.watching {
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+
+  padding: 5px 9px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(55, 91, 190, 0.8),
+      rgba(126, 57, 160, 0.8)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  white-space: nowrap;
+}
+
+.watching b {
+  color: #7fa0ff;
+}
+
+@media (max-width: 600px) {
+
+  #status {
+    font-size: 11px;
+  }
+
+  .watching {
+    font-size: 10px;
+    padding: 4px 7px;
+  }
+}
