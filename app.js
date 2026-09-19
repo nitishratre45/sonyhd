@@ -3,7 +3,7 @@
 // =========================================================
 
 const STREAM_URL =
-  "https://films-sender-arrivals-field.trycloudflare.com/live/index.m3u8";
+  "https://cloudplay-sonyliv.pages.dev/ten3.m3u8";
 
 const video = document.getElementById("videoPlayer");
 const streamStatus = document.getElementById("streamStatus");
