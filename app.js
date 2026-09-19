@@ -3,7 +3,7 @@
 // =========================================================
 
 const STREAM_URL =
-  "https://tvsen5.aynascope.net/cXPB2LKkErN9/index.m3u8";
+  "https://cloudplay-sonyliv.pages.dev/ten3hd.m3u8";
 
 const video = document.getElementById("videoPlayer");
 const streamStatus = document.getElementById("streamStatus");
