@@ -3,7 +3,7 @@
 // =========================================================
 
 const STREAM_URL =
-  "http://tvsen5.aynascope.net/cXPB2LKkErN9/index.m3u8";
+  "https://tvsen5.aynascope.net/cXPB2LKkErN9/index.m3u8";
 
 const video = document.getElementById("videoPlayer");
 const streamStatus = document.getElementById("streamStatus");
