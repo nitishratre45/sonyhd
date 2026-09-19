@@ -608,3 +608,61 @@ video {
     padding: 4px 7px;
   }
 }
+
+#status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+#streamStatus {
+  color: #b8c1dc;
+  font-size: 13px;
+}
+
+.watching {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  padding: 5px 9px;
+
+  border-radius: 20px;
+
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  background: linear-gradient(
+    135deg,
+    rgba(55, 91, 190, 0.9),
+    rgba(126, 57, 160, 0.9)
+  );
+
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.watching b {
+  color: #8eabff;
+}
+
+@media (max-width: 600px) {
+
+  #status {
+    min-height: 38px;
+    gap: 6px;
+  }
+
+  #streamStatus {
+    font-size: 11px;
+  }
+
+  .watching {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+}

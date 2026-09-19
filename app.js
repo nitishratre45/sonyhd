@@ -12,7 +12,7 @@ if (Hls.isSupported()) {
   hls.attachMedia(video);
 
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
-    status.textContent = "LIVE â€¢ Stream connected";
+    document.getElementById("streamStatus").textContent = "LIVE - Stream connected";
     video.play().catch(() => {});
   });
 
@@ -20,7 +20,7 @@ if (Hls.isSupported()) {
     console.log("HLS Error:", data);
 
     if (data.fatal) {
-      status.textContent = "Stream unavailable";
+      document.getElementById("streamStatus").textContent = "Stream unavailable";
     }
   });
 
@@ -29,14 +29,13 @@ if (Hls.isSupported()) {
   video.src = STREAM_URL;
 
   video.addEventListener("loadedmetadata", () => {
-    status.textContent = "LIVE â€¢ Stream connected";
+    document.getElementById("streamStatus").textContent = "LIVE - Stream connected";
     video.play().catch(() => {});
   });
 
 } else {
 
-  status.textContent =
-    "Your browser does not support HLS.";
+  document.getElementById("streamStatus").textContent = "Your browser does not support HLS."; 
 }
 /* =========================================================
    FIREBASE LIVE VIEWERS
@@ -103,5 +102,8 @@ onValue(viewers, (snapshot) => {
     totalWatching
   );
 });
+
+
+
 
 
