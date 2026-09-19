@@ -1,5 +1,5 @@
-﻿// =========================================================
-// HLS LIVE PLAYER
+// =========================================================
+// HLS LIVE PLAYER - DIAGNOSTIC VERSION
 // =========================================================
 
 const STREAM_URL =
@@ -9,344 +9,286 @@ const video = document.getElementById("videoPlayer");
 const streamStatus = document.getElementById("streamStatus");
 
 let hls = null;
-let reconnectTimer = null;
-let reconnectAttempts = 0;
 
 function setStatus(message) {
   if (streamStatus) {
     streamStatus.textContent = message;
   }
+
+  console.log("[PLAYER]", message);
 }
 
 function startHLS() {
-  if (!video) return;
 
-  clearTimeout(reconnectTimer);
+  if (!video) {
+    console.error("videoPlayer not found");
+    return;
+  }
 
-  // Destroy previous HLS instance before creating a new one
   if (hls) {
     try {
       hls.destroy();
-    } catch (error) {
-      console.log("HLS destroy error:", error);
+    } catch (e) {
+      console.log("Destroy error:", e);
     }
+
     hls = null;
   }
 
-  // -------------------------------------------------------
-  // Chrome / Edge / Firefox
-  // -------------------------------------------------------
+  setStatus("Connecting to live stream...");
+
+  // Android Chrome / modern browsers
   if (Hls.isSupported()) {
+
+    console.log("HLS.js supported");
+
     hls = new Hls({
       enableWorker: true,
 
-      // Live-stream stability
       lowLatencyMode: false,
 
-      // Keep a small live buffer
-      maxBufferLength: 12,
-      maxMaxBufferLength: 20,
+      maxBufferLength: 20,
+      maxMaxBufferLength: 30,
 
-      // Don't keep too much old live content
-      backBufferLength: 30,
-
-      // Stay close to live edge
       liveSyncDurationCount: 3,
-      liveMaxLatencyDurationCount: 8,
+      liveMaxLatencyDurationCount: 10,
 
-      // Manifest retry
-      manifestLoadingMaxRetry: 6,
-      manifestLoadingRetryDelay: 1000,
-      manifestLoadingMaxRetryTimeout: 8000,
-
-      // Fragment retry
-      fragLoadingMaxRetry: 8,
-      fragLoadingRetryDelay: 1000,
-      fragLoadingMaxRetryTimeout: 8000,
-
-      // Level retry
-      levelLoadingMaxRetry: 6,
-      levelLoadingRetryDelay: 1000,
-      levelLoadingMaxRetryTimeout: 8000,
-
-      // Prevent unnecessary stalls
       maxBufferHole: 0.5,
-      highBufferWatchdogPeriod: 2
+
+      manifestLoadingMaxRetry: 3,
+      fragLoadingMaxRetry: 3,
+
+      debug: false
     });
 
     hls.loadSource(STREAM_URL);
+
     hls.attachMedia(video);
 
-    // -----------------------------------------------------
+
+    // -------------------------------
     // Manifest loaded
-    // -----------------------------------------------------
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      reconnectAttempts = 0;
+    // -------------------------------
 
-      setStatus("LIVE - Stream connected");
+    hls.on(Hls.Events.MANIFEST_PARSED, function () {
 
-      video.play().catch(() => {
-        console.log("Autoplay waiting for user interaction.");
-      });
+      console.log("MANIFEST PARSED");
 
-      // If player is behind live edge, move closer to live
-      try {
-        if (hls.liveSyncPosition) {
-          video.currentTime = hls.liveSyncPosition;
-        }
-      } catch (error) {
-        console.log("Live position adjustment skipped.");
-      }
+      setStatus("Stream found - loading video...");
+
+      video.play()
+        .then(() => {
+          console.log("Video playback started");
+        })
+        .catch(() => {
+          setStatus("Tap ▶ Play to start");
+        });
     });
 
-    // -----------------------------------------------------
+
+    // -------------------------------
+    // Fragment loading
+    // -------------------------------
+
+    hls.on(Hls.Events.FRAG_LOADING, function (event, data) {
+
+      console.log(
+        "Fragment loading:",
+        data.frag?.url
+      );
+
+      setStatus("Loading live video...");
+    });
+
+
+    // -------------------------------
     // Fragment loaded
-    // -----------------------------------------------------
-    hls.on(Hls.Events.FRAG_LOADED, () => {
-      reconnectAttempts = 0;
+    // -------------------------------
 
-      if (streamStatus) {
-        streamStatus.textContent = "LIVE - Stream connected";
+    hls.on(Hls.Events.FRAG_LOADED, function (event, data) {
+
+      console.log(
+        "Fragment loaded:",
+        data.frag?.url
+      );
+
+      setStatus("Live video received...");
+    });
+
+
+    // -------------------------------
+    // Buffer appended
+    // -------------------------------
+
+    hls.on(Hls.Events.BUFFER_APPENDED, function () {
+
+      console.log("Video buffer appended");
+
+      if (!video.paused) {
+        setStatus("LIVE - Playing");
       }
     });
 
-    // -----------------------------------------------------
-    // HLS errors
-    // -----------------------------------------------------
-    hls.on(Hls.Events.ERROR, (event, data) => {
-      console.log("HLS Error:", data);
 
-      // Non-fatal errors are usually temporary.
-      if (!data.fatal) {
-        return;
-      }
+    // -------------------------------
+    // Video playing
+    // -------------------------------
 
-      // ---------------------------------------------------
-      // Network error
-      // ---------------------------------------------------
-      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-        setStatus("Reconnecting to live stream...");
+    video.addEventListener("playing", function () {
 
-        reconnectAttempts++;
+      console.log("HTML video PLAYING");
 
-        clearTimeout(reconnectTimer);
+      setStatus("LIVE - Playing");
+    });
 
-        const delay = Math.min(
-          1500 * reconnectAttempts,
-          6000
+
+    // -------------------------------
+    // Waiting / buffering
+    // -------------------------------
+
+    video.addEventListener("waiting", function () {
+
+      console.log("Video waiting");
+
+      setStatus("Buffering live stream...");
+    });
+
+
+    // -------------------------------
+    // Stalled
+    // -------------------------------
+
+    video.addEventListener("stalled", function () {
+
+      console.log("Video stalled");
+
+      setStatus("Stream stalled...");
+    });
+
+
+    // -------------------------------
+    // Video error
+    // -------------------------------
+
+    video.addEventListener("error", function () {
+
+      console.error(
+        "VIDEO ERROR:",
+        video.error
+      );
+
+      if (video.error) {
+
+        setStatus(
+          "Video error: " +
+          video.error.code
         );
+      }
+    });
 
-        reconnectTimer = setTimeout(() => {
-          if (!hls) return;
 
-          console.log("Attempting HLS network recovery...");
+    // -------------------------------
+    // HLS errors
+    // -------------------------------
+
+    hls.on(Hls.Events.ERROR, function (event, data) {
+
+      console.error("HLS ERROR:", data);
+
+      if (data.fatal) {
+
+        if (
+          data.type ===
+          Hls.ErrorTypes.NETWORK_ERROR
+        ) {
+
+          setStatus(
+            "Network error - stream unavailable"
+          );
+
+          console.error(
+            "Network error:",
+            data.details
+          );
+
+        } else if (
+          data.type ===
+          Hls.ErrorTypes.MEDIA_ERROR
+        ) {
+
+          setStatus(
+            "Media/codec error"
+          );
+
+          console.error(
+            "Media error:",
+            data.details
+          );
 
           try {
-            hls.startLoad(-1);
-          } catch (error) {
-            console.log("startLoad recovery failed:", error);
-            startHLS();
+            hls.recoverMediaError();
+          } catch (e) {
+            console.error(e);
           }
-        }, delay);
 
-        return;
-      }
+        } else {
 
-      // ---------------------------------------------------
-      // Media error
-      // ---------------------------------------------------
-      if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-        setStatus("Recovering live video...");
+          setStatus(
+            "HLS error: " +
+            data.details
+          );
 
-        try {
-          hls.recoverMediaError();
-        } catch (error) {
-          console.log("Media recovery failed:", error);
-          startHLS();
+          console.error(
+            "Fatal HLS error:",
+            data
+          );
         }
-
-        return;
-      }
-
-      // ---------------------------------------------------
-      // Other fatal error
-      // ---------------------------------------------------
-      setStatus("Reconnecting to live stream...");
-
-      clearTimeout(reconnectTimer);
-
-      reconnectAttempts++;
-
-      reconnectTimer = setTimeout(() => {
-        startHLS();
-      }, 2000);
-    });
-
-    // -----------------------------------------------------
-    // Video stalled
-    // -----------------------------------------------------
-    video.addEventListener("stalled", () => {
-      console.log("Video stalled.");
-
-      if (streamStatus) {
-        streamStatus.textContent = "Buffering live stream...";
-      }
-    });
-
-    // -----------------------------------------------------
-    // Video playing
-    // -----------------------------------------------------
-    video.addEventListener("playing", () => {
-      if (streamStatus) {
-        streamStatus.textContent = "LIVE - Stream connected";
       }
     });
 
     return;
   }
 
-  // -------------------------------------------------------
-  // Safari / native HLS
-  // -------------------------------------------------------
-  if (video.canPlayType("application/vnd.apple.mpegurl")) {
+
+  // =====================================================
+  // Native HLS
+  // =====================================================
+
+  if (
+    video.canPlayType(
+      "application/vnd.apple.mpegurl"
+    )
+  ) {
+
+    console.log("Native HLS supported");
+
     video.src = STREAM_URL;
 
     video.addEventListener(
       "loadedmetadata",
-      () => {
-        setStatus("LIVE - Stream connected");
+      function () {
+
+        setStatus(
+          "Stream found - loading video..."
+        );
 
         video.play().catch(() => {
-          console.log("Autoplay waiting for user interaction.");
+          setStatus(
+            "Tap ▶ Play to start"
+          );
         });
+
       },
       { once: true }
     );
 
-    video.addEventListener("error", () => {
-      setStatus("Reconnecting to live stream...");
-
-      clearTimeout(reconnectTimer);
-
-      reconnectTimer = setTimeout(() => {
-        video.src = STREAM_URL;
-        video.load();
-      }, 3000);
-    });
-
     return;
   }
 
-  // -------------------------------------------------------
-  // Browser doesn't support HLS
-  // -------------------------------------------------------
-  setStatus("Your browser does not support HLS.");
+
+  setStatus(
+    "This browser does not support HLS."
+  );
 }
 
-// Start player
 startHLS();
-
-
-// =========================================================
-// FIREBASE LIVE VIEWERS
-// 150 BASE + REAL ACTIVE VISITORS
-// =========================================================
-
-import { initializeApp } from
-  "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-
-import {
-  getDatabase,
-  ref,
-  push,
-  onDisconnect,
-  onValue,
-  set,
-  serverTimestamp
-} from
-  "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
-
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDm3DIHJfRPEqNqrUlYJutRQm8XIA6H3fs",
-
-  authDomain:
-    "cricket-live-39106.firebaseapp.com",
-
-  databaseURL:
-    "https://cricket-live-39106-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-  projectId:
-    "cricket-live-39106",
-
-  storageBucket:
-    "cricket-live-39106.firebasestorage.app",
-
-  messagingSenderId:
-    "841890143",
-
-  appId:
-    "1:841890143:web:ca5b87c9395bdc19145eea",
-
-  measurementId:
-    "G-ZNEZC8YVMX"
-};
-
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const database = getDatabase(firebaseApp);
-
-
-// Active viewers location
-const viewers = ref(database, "liveViewers");
-
-
-// Create unique viewer session
-const currentViewer = push(viewers);
-
-
-// Remove this visitor automatically
-// when browser/network connection closes.
-onDisconnect(currentViewer)
-  .remove()
-  .catch((error) => {
-    console.log("onDisconnect error:", error);
-  });
-
-
-// Register current visitor
-set(currentViewer, {
-  joinedAt: serverTimestamp()
-})
-  .catch((error) => {
-    console.log("Viewer registration error:", error);
-  });
-
-
-// Update viewer counter
-onValue(viewers, (snapshot) => {
-
-  const data = snapshot.val() || {};
-
-  const realVisitors =
-    Object.keys(data).length;
-
-  // Fixed base + actual active visitors
-  const totalWatching =
-    150 + realVisitors;
-
-  const viewerElement =
-    document.getElementById("watchingCount");
-
-  if (viewerElement) {
-    viewerElement.textContent =
-      totalWatching.toLocaleString();
-  }
-
-  console.log(
-    "Live Watching:",
-    totalWatching
-  );
-});
